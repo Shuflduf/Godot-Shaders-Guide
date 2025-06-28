@@ -1,10 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://c3gkwtgd47uw3"]
+[gd_scene load_steps=5 format=3 uid="uid://c3gkwtgd47uw3"]
 
+[ext_resource type="Shader" uid="uid://cuoubu67025p4" path="res://main.gdshader" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://bhgmbu2dxntah" path="res://main.gd" id="1_h2yge"]
 [ext_resource type="Texture2D" uid="uid://vc5b58scx82m" path="res://icon.svg" id="1_ig7tw"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h2yge"]
+shader = ExtResource("1_0xm2m")
+
 [node name="Main" type="Node2D"]
+script = ExtResource("1_h2yge")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_h2yge")
 texture = ExtResource("1_ig7tw")
 
 [node name="Camera2D" type="Camera2D" parent="."]

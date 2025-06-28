@@ -1,20 +1,31 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	// const engine = new Engine({});
 	let cnvs = $state();
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
 	onMount(async () => {
-		console.log(cnvs);
+		// @ts-ignore
 		const engine = new Engine({
 			executable: wasm,
 			mainPack: pck,
 			canvas: cnvs,
-			canvasResizePolicy: 0
+			canvasResizePolicy: 0,
+			onPrint
 		});
 		await engine.startGame();
+		window.onclick = () => updateShader('AAAAAAAAA');
 	});
+
+	// function updateShader(newShader: string) {
+	// 	console.log('JS', newShader);
+	// 	return newShader;
+	// }
+	let updateShader: any = undefined;
+
+	function onPrint(text: string) {
+		console.log('Godot:', text);
+	}
 </script>
 
 <div class="flex h-screen w-screen flex-col items-center justify-center gap-8">
