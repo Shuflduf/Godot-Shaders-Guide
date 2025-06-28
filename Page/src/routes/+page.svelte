@@ -1,17 +1,25 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
 	// const engine = new Engine({});
-	const cnvs = document.querySelector('#canvas');
+	let cnvs = $state();
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
-	const engine = new Engine({
-		executable: wasm,
-		mainPack: pck,
-		canvas: cnvs,
-		canvasResizePolicy: 0
+	onMount(async () => {
+		console.log(cnvs);
+		const engine = new Engine({
+			executable: wasm,
+			mainPack: pck,
+			canvas: cnvs,
+			canvasResizePolicy: 0
+		});
+		await engine.startGame();
 	});
-	engine.startGame();
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-<canvas id="canvas"></canvas>
+<div class="flex h-screen w-screen flex-col items-center justify-center gap-8">
+	<h1 class="text-center text-3xl font-bold">
+		LOOK ITS THE ICON.SVG FROM HIT GAME ENGINE GODOT GAME ENGINE
+	</h1>
+	<canvas id="canvas" width="400" height="400" bind:this={cnvs}></canvas>
+</div>
