@@ -4,9 +4,12 @@
 	import { onMount } from 'svelte';
 	import { indentWithTab } from '@codemirror/commands';
 	import { javascript } from '@codemirror/lang-javascript';
+	import { catppuccinMocha } from '@catppuccin/codemirror';
+	import { cpp } from '@codemirror/lang-cpp';
 
 	let cnvs = $state();
 	let shaderText: string = $state('fuck you');
+	let editor: EditorView | null = $state(null);
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
 	onMount(async () => {
@@ -19,25 +22,27 @@
 			onPrint
 		});
 		await engine.startGame();
-		new EditorView({
-			parent: document.querySelector('#code-editor'),
+		shaderText = await (await fetch('/main.gdshader')).text();
+		editor = new EditorView({
+			doc: shaderText,
+			parent: document.querySelector('#code-editor') as Element,
 			extensions: [
 				basicSetup,
+				catppuccinMocha,
 				keymap.of([indentWithTab]),
-				javascript(),
+				cpp(),
 				EditorView.theme({
 					'&': { height: '100%', maxHeight: '400px', minHeight: '400px' },
 					'.cm-scroller': { overflow: 'auto' }
 				})
 			]
 		});
-		shaderText = await (await fetch('/main.gdshader')).text();
 	});
 
 	function safeUpdateShader() {
 		const updateShader = (window as any).updateShader as ((shader: string) => void) | undefined;
 		if (updateShader) {
-			let res = updateShader(shaderText);
+			let res = updateShader(editor?.state.doc.toString() as string);
 			console.log(res);
 		}
 	}
