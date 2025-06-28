@@ -1,7 +1,12 @@
 <script lang="ts">
+	import { basicSetup, EditorView } from 'codemirror';
+	import { keymap } from '@codemirror/view';
 	import { onMount } from 'svelte';
+	import { indentWithTab } from '@codemirror/commands';
+	import { javascript } from '@codemirror/lang-javascript';
 
 	let cnvs = $state();
+	let shaderText: string = $state('fuck you');
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
 	onMount(async () => {
@@ -14,14 +19,37 @@
 			onPrint
 		});
 		await engine.startGame();
-		window.onclick = () => updateShader('AAAAAAAAA');
+		new EditorView({
+			parent: document.querySelector('#code-editor'),
+			extensions: [
+				basicSetup,
+				keymap.of([indentWithTab]),
+				javascript(),
+				EditorView.theme({
+					'&': { height: '100%', maxHeight: '400px', minHeight: '400px' },
+					'.cm-scroller': { overflow: 'auto' }
+				})
+			]
+		});
+		shaderText = await (await fetch('/main.gdshader')).text();
 	});
+
+	function safeUpdateShader() {
+		const updateShader = (window as any).updateShader as ((shader: string) => void) | undefined;
+		if (updateShader) {
+			let res = updateShader(shaderText);
+			console.log(res);
+		}
+	}
 
 	// function updateShader(newShader: string) {
 	// 	console.log('JS', newShader);
 	// 	return newShader;
 	// }
-	let updateShader: any = undefined;
+
+	function getShaderText(): string {
+		return shaderText;
+	}
 
 	function onPrint(text: string) {
 		console.log('Godot:', text);
@@ -32,5 +60,13 @@
 	<h1 class="text-center text-3xl font-bold">
 		LOOK ITS THE ICON.SVG FROM HIT GAME ENGINE GODOT GAME ENGINE
 	</h1>
-	<canvas id="canvas" width="400" height="400" bind:this={cnvs}></canvas>
+	<button onclick={safeUpdateShader}>DO THE</button>
+	<div class="flex flex-row">
+		<canvas id="canvas" width="400" height="400" bind:this={cnvs}></canvas>
+		<div class="flex h-[400] max-h-[400] flex-col">
+			<div id="code-editor" class="w-xl h-full" style="height: 400px;"></div>
+			<p>Press esc before pressing tab to leave editor focus</p>
+		</div>
+		<!-- <textarea class="w-xl" bind:value={shaderText}></textarea> -->
+	</div>
 </div>

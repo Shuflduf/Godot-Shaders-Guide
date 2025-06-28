@@ -10,6 +10,4 @@ func _ready() -> void:
 
 func _update_shader(args):
 	var event = args[0]
-	event.preventDefault()
-	event.returnValue = "BBBBBBBBBB"
-	console.log("GD", args)
+	$Sprite2D.get_material().get_shader().set_code(event)
