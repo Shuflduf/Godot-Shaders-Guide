@@ -13,7 +13,7 @@
 </script>
 
 <div
-	class="relative h-[360px] w-[360px]"
+	class="relative h-[360px] w-[360px] overflow-clip rounded-md shadow-md hover:shadow-lg"
 	onmousemove={onMouseMove}
 	onmouseleave={onMouseLeave}
 	role="region"

@@ -13,11 +13,12 @@
 	<img src="icon.png" class="w-80" alt="godot shaders icon" />
 </div>
 
-<div class="flex h-[24rem] w-screen items-center justify-evenly bg-slate-300">
-	<div>
+<div class="flex h-[26rem] w-screen items-center justify-evenly bg-slate-300">
+	<div class="flex flex-col gap-2">
 		<VidSlider src1="/after.webm" src2="/before.webm"></VidSlider>
 		<!-- <video src="/after.webm" autoplay loop><track kind="captions" /></video> -->
 		<!-- <video src="/before.webm" autoplay loop><track kind="captions" /></video> -->
+		<p class="text-center font-[Arvo] italic">Hover me!</p>
 	</div>
 	<div>
 		<h1 class="mb-2 text-center font-[Arvo] text-3xl font-bold">What are Godot shaders?</h1>
