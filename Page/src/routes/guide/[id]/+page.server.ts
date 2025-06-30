@@ -4,11 +4,13 @@ import { Client } from "@notionhq/client"
 import { NotionToMarkdown } from "notion-to-md";
 import { marked } from "marked";
 
+const cache: Record<string, { lastEdited: string, data: any }> = {};
+
 export const load: PageServerLoad = async ({ params }) => {
   const notion = new Client({
     auth: env.NOTION_KEY
-  })
-  const n2m = new NotionToMarkdown({ notionClient: notion })
+  });
+  const n2m = new NotionToMarkdown({ notionClient: notion });
 
   const dbRes = await notion.databases.query({
     database_id: env.NOTION_DATABASE_ID,
@@ -16,12 +18,23 @@ export const load: PageServerLoad = async ({ params }) => {
       property: "ID",
       rich_text: { equals: params.id }
     }
-  })
-  const id = dbRes.results[0].id
-  const blocks = await n2m.pageToMarkdown(id)
-  const mdString = n2m.toMarkdownString(blocks).parent
-  const html = marked.parse(mdString)
-  console.log(html);
+  });
+  const page = dbRes.results[0] as any;
+  const props = page.properties;
+  const lastEdited = page.last_edited_time;
 
-  return { html }
+  if (cache[params.id] && cache[params.id].lastEdited === lastEdited) {
+    return cache[params.id].data;
+  }
+
+  const name = props["Name"].title[0].text.content;
+  const next = props["Next"].rich_text[0].text.content;
+  const id = page.id;
+  const blocks = await n2m.pageToMarkdown(id);
+  const mdString = `# ${name}\n ${n2m.toMarkdownString(blocks).parent}`;
+  const html = marked.parse(mdString);
+  const data = { html, name, next };
+
+  cache[params.id] = { lastEdited, data };
+  return data;
 };

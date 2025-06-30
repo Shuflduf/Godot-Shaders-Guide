@@ -1,7 +1,25 @@
 <script lang="ts">
+	import GodotEditor from '$lib/components/GodotEditor.svelte';
+	import { SHUFL_BOX } from '$lib/styles';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 </script>
 
-<h1>{@html data.html}</h1>
+<title>{data.name}</title>
+<div class="fixed flex h-screen w-screen flex-col gap-4 p-4">
+	<nav class="h-24 w-full {SHUFL_BOX}"></nav>
+	<div class="flex h-full flex-row gap-4">
+		<main class="prose h-full max-h-[calc(80vh)] w-sm {SHUFL_BOX} overflow-y-auto">
+			{@html data.html}
+			<a href="/guide/{data.next}">
+				<button
+					class="w-full cursor-pointer rounded-md bg-blue-400 p-4 font-[Arvo] text-lg text-white underline"
+				>
+					Next Topic
+				</button>
+			</a>
+		</main>
+		<GodotEditor></GodotEditor>
+	</div>
+</div>
