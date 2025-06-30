@@ -32,6 +32,19 @@
 		</p>
 	</div>
 </div>
+<div class="flex h-[26rem] w-screen items-center justify-evenly bg-slate-300">
+	<div>
+		<h1 class="mb-2 text-center font-[Arvo] text-3xl font-bold">Guide Contents</h1>
+		<ul class="list-disc">
+			<li>Explanation of Shaders</li>
+			<li>Godot's Shading Language</li>
+			<li>Texture Sampling</li>
+			<li>Procedural Effects</li>
+			<li>Post-Processing</li>
+			<li>Integration with Godot Scripts</li>
+		</ul>
+	</div>
+</div>
 <!-- <div class="flex h-screen w-screen flex-col items-center justify-center gap-8"> -->
 <!-- 	<h1 class="text-center text-3xl font-bold"> -->
 <!-- 		LOOK ITS THE ICON.SVG FROM HIT GAME ENGINE GODOT GAME ENGINE -->
