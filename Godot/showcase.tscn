@@ -1,14 +1,15 @@
-[gd_scene load_steps=13 format=3 uid="uid://dcv1hfx0o2u5d"]
+[gd_scene load_steps=14 format=3 uid="uid://dcv1hfx0o2u5d"]
 
 [ext_resource type="Script" uid="uid://chgw75v6vh1fr" path="res://showcase.gd" id="1_ewnj5"]
 [ext_resource type="Shader" uid="uid://c6ewq4cwd8m1b" path="res://glooby.gdshader" id="2_ga7p2"]
 [ext_resource type="Shader" uid="uid://bw4u6gopwic0p" path="res://showcase.gdshader" id="2_lou5n"]
+[ext_resource type="Texture2D" uid="uid://bjgbl0dfdq3yw" path="res://glomzy-07-1x.png" id="3_a77a3"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_a77a3"]
-sky_top_color = Color(1, 1, 1, 1)
-sky_horizon_color = Color(2.1665, 2.1665, 2.1665, 1)
-ground_bottom_color = Color(1, 1, 1, 1)
-ground_horizon_color = Color(2.1665, 2.1665, 2.1665, 1)
+sky_top_color = Color(0, 0, 0, 1)
+sky_horizon_color = Color(0, 0, 0, 1)
+ground_bottom_color = Color(0, 0, 0, 1)
+ground_horizon_color = Color(0, 0, 0, 1)
 energy_multiplier = 0.4
 
 [sub_resource type="Sky" id="Sky_ga7p2"]
@@ -19,21 +20,20 @@ background_mode = 2
 sky = SubResource("Sky_ga7p2")
 tonemap_mode = 2
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_ga7p2"]
-noise_type = 3
-
-[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_mjats"]
-seamless = true
-noise = SubResource("FastNoiseLite_ga7p2")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_76duf"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ga7p2"]
 render_priority = 0
 shader = ExtResource("2_ga7p2")
-shader_parameter/color1 = Color(0.15, 0, 0, 1)
-shader_parameter/color2 = Color(0.25, 0.0225, 0.0225, 1)
-shader_parameter/noise = SubResource("NoiseTexture3D_mjats")
+shader_parameter/battery = 1.0
+shader_parameter/anchor = -0.5
+shader_parameter/speed_scale = 1.0
+shader_parameter/fov = 0.2
+shader_parameter/background_color = Vector4(0, 0.1, 0.2, 1)
+shader_parameter/grid_color = Vector4(1, 0.5, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_nha35"]
+subdivide_width = 8
+subdivide_height = 8
+subdivide_depth = 8
 
 [sub_resource type="QuadMesh" id="QuadMesh_lou5n"]
 
@@ -43,8 +43,14 @@ shader = ExtResource("2_lou5n")
 shader_parameter/TwixelAngle = 45.0
 shader_parameter/PixelSize = 5.0
 shader_parameter/Quantize = false
+shader_parameter/PaletteTexture = ExtResource("3_a77a3")
 shader_parameter/Posterize = true
 shader_parameter/ColorSteps = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ga7p2"]
+shading_mode = 0
+
+[sub_resource type="QuadMesh" id="QuadMesh_mjats"]
 
 [node name="Showcase" type="Node2D"]
 script = ExtResource("1_ewnj5")
@@ -67,15 +73,14 @@ grow_vertical = 2
 stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer"]
-transparent_bg = true
 handle_input_locally = false
 size = Vector2i(400, 400)
 render_target_update_mode = 4
 
 [node name="Mesh" type="MeshInstance3D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
 unique_name_in_owner = true
-transform = Transform3D(0.67262, 0.000312891, -0.740003, -0.000403532, 1, 5.60512e-05, 0.740003, 0.000260904, 0.67262, 0, 0, 0)
-material_override = SubResource("ShaderMaterial_76duf")
+transform = Transform3D(0.973127, 0, -0.229518, 0, 0.999995, 0, 0.229521, 0, 0.973122, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_ga7p2")
 mesh = SubResource("BoxMesh_nha35")
 
 [node name="Camera3D" type="Camera3D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
@@ -85,3 +90,9 @@ fov = 30.0
 [node name="Quad" type="MeshInstance3D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
 mesh = SubResource("QuadMesh_lou5n")
 surface_material_override/0 = SubResource("ShaderMaterial_a77a3")
+
+[node name="BG" type="MeshInstance3D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+transform = Transform3D(11.8038, 0, 0, 0, 11.8038, 0, 0, 0, 11.8038, 0, 0, -5.84833)
+material_override = SubResource("StandardMaterial3D_ga7p2")
+mesh = SubResource("QuadMesh_mjats")
+skeleton = NodePath("../../../..")

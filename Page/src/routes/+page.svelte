@@ -1,5 +1,6 @@
 <script>
 	import GodotEditor from '$lib/components/GodotEditor.svelte';
+	import VidSlider from '$lib/components/VidSlider.svelte';
 </script>
 
 <div class="flex h-[36rem] w-screen items-center justify-evenly">
@@ -14,9 +15,9 @@
 
 <div class="flex h-[24rem] w-screen items-center justify-evenly bg-slate-300">
 	<div>
-		<video src="/output.webm" autoplay loop><track kind="captions" /></video>
-		<img src="icon.png" class="h-60 w-80" alt="godot shaders icon" />
-		<p>put like the little slider overlay comparison thing</p>
+		<VidSlider src1="/after.webm" src2="/before.webm"></VidSlider>
+		<!-- <video src="/after.webm" autoplay loop><track kind="captions" /></video> -->
+		<!-- <video src="/before.webm" autoplay loop><track kind="captions" /></video> -->
 	</div>
 	<div>
 		<h1 class="mb-2 text-center font-[Arvo] text-3xl font-bold">What are Godot shaders?</h1>

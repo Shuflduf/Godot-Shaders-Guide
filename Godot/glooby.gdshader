@@ -1,34 +1,29 @@
 shader_type spatial;
-render_mode unshaded;
 
-uniform vec3 color1 : source_color;
-uniform vec3 color2 : source_color;
-uniform sampler3D noise;
+uniform float battery : hint_range(0.0,1.0) = 1.0;
+uniform float anchor : hint_range(-1.0,1.0) = -0.5;
+uniform float speed_scale : hint_range(1.0, 10.0) = 1.0;
+uniform float fov : hint_range(0.01, 1.0) = 0.2;
+uniform vec4 background_color  = vec4(0.0, 0.1, 0.2, 1.0);
+uniform vec4 grid_color  = vec4(1.0, 0.5, 1.0, 1.0);
 
-varying float lookDot;
-
-void vertex() {
-
-	// stole code from https://godotshaders.com/shader/stylized-metal/
-	vec3 worldNormal = normalize(MODEL_NORMAL_MATRIX * NORMAL);
-	vec3 lookDir = normalize((MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz - (INV_VIEW_MATRIX * vec4(EYE_OFFSET, 1.0)).xyz);
-
-	lookDot = abs(dot(lookDir, worldNormal));
+float grid(vec2 uv, float batt) {
+    vec2 size = vec2(uv.y, uv.y * uv.y * 0.2) * 0.01;
+    uv += vec2(0.0, TIME * speed_scale * (batt + 0.05));
+    uv = abs(fract(uv) - 0.5);
+  vec2 lines = smoothstep(size, vec2(0.0), uv);
+  lines += smoothstep(size * 5.0, vec2(0.0), uv) *0.4 * batt;
+    return clamp(lines.x + lines.y, 0.0, 3.0);
 }
 
 void fragment() {
+ vec2 uv = UV;
 
-	// sample texture (VERTEX is in view space, must go to world space)
-	float sample = texture(noise, (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz - NODE_POSITION_WORLD + vec3(TIME * 0.1, 0, 0)).x;
-
-	// two color areas
-	vec3 color = mix(color1, color2, step(0.5, sample));
-
-	// white band between colors
-	color = mix(color, vec3(0.1,0,0), clamp(1.0 - 1000.0 * pow(sample - 0.5, 2), 0.0, 1.0));
-
-	// rim light
-	color = mix(vec3(1,1,1), color, clamp((1.0 - 2.0 * pow(lookDot - 0.5, 3)), 0.0, 1.0));
-
-	ALBEDO = color;
+ vec4 col = background_color;
+    uv.y = 3.0 / (abs(uv.y + fov) + 0.05);
+ uv.x += anchor;
+    uv.x *= uv.y * 1.0;
+    float gridVal = grid(uv, battery);
+    col = mix(background_color, grid_color, gridVal);
+ ALBEDO = col.rgb;
 }
