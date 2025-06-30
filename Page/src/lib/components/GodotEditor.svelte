@@ -22,11 +22,18 @@
 	let editor: EditorView | null = $state(null);
 	let editorUpdateTimeout: number | null = null;
 	let currentErrors: Error[] = $state([]);
+	let started: boolean = $state(false);
+	let loading: boolean = $state(false);
 
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
 
 	async function start() {
+		if (started) {
+			return;
+		}
+		started = true;
+		loading = true;
 		shaderText = await (await fetch('/main.gdshader')).text();
 		editor = new EditorView({
 			doc: shaderText,
@@ -54,7 +61,7 @@
 					}
 				}),
 				EditorView.theme({
-					'&': { height: '100%', maxHeight: '400px', minHeight: '400px' },
+					'&': { height: '100%', minHeight: '380px' },
 					'.cm-scroller': { overflow: 'auto' }
 				})
 			]
@@ -67,14 +74,16 @@
 			canvas: cnvs,
 			canvasResizePolicy: 0,
 			onPrint,
-			onPrintError
+			onPrintError,
+			onProgress
 		});
 		await engine.startGame();
+		loading = false;
 	}
 
-	onMount(async () => {
-		await start();
-	});
+	// onMount(async () => {
+	// 	await start();
+	// });
 
 	function safeUpdateShader() {
 		const updateShader = (window as any).updateShader as ((shader: string) => void) | undefined;
@@ -102,15 +111,32 @@
 	function onPrint(text: string) {
 		console.log('Godot:', text);
 	}
+
+	function onProgress(current: number, total: number) {
+		console.log(current, total);
+	}
 </script>
 
-<div class="flex flex-row">
-	<canvas id="canvas" width="400" height="400" bind:this={cnvs}></canvas>
-	<div class="flex h-[400] max-h-[400] flex-col">
-		<div id="code-editor" class="h-full w-xl" style="height: 400px;"></div>
-		<tt class="bg-[#1e1e2e] text-center text-white">
-			Press esc before pressing tab to leave editor focus
-		</tt>
-	</div>
-</div>
+<button class="flex h-[400px] w-4xl max-w-4xl flex-row items-center justify-center" onclick={start}>
+	{#if !started}
+		<div class="flex h-full w-full items-center justify-center bg-slate-300 text-7xl">
+			Start Engine
+		</div>
+	{:else}
+		<canvas
+			id="canvas"
+			width="400"
+			height="400"
+			class="h-full w-[400px] flex-shrink-0 bg-red-500"
+			bind:this={cnvs}
+			>Loading
+		</canvas>
+		<div class="flex h-full max-h-full min-w-0 flex-1 flex-col">
+			<div id="code-editor" class="min-h-0 flex-1 text-left"></div>
+			<tt class="bg-[#1e1e2e] text-center text-white">
+				Press esc before pressing tab to leave editor focus
+			</tt>
+		</div>
+	{/if}
+</button>
 <!-- <textarea class="w-xl" bind:value={shaderText}></textarea> -->

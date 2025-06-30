@@ -1,0 +1,87 @@
+[gd_scene load_steps=13 format=3 uid="uid://dcv1hfx0o2u5d"]
+
+[ext_resource type="Script" uid="uid://chgw75v6vh1fr" path="res://showcase.gd" id="1_ewnj5"]
+[ext_resource type="Shader" uid="uid://c6ewq4cwd8m1b" path="res://glooby.gdshader" id="2_ga7p2"]
+[ext_resource type="Shader" uid="uid://bw4u6gopwic0p" path="res://showcase.gdshader" id="2_lou5n"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_a77a3"]
+sky_top_color = Color(1, 1, 1, 1)
+sky_horizon_color = Color(2.1665, 2.1665, 2.1665, 1)
+ground_bottom_color = Color(1, 1, 1, 1)
+ground_horizon_color = Color(2.1665, 2.1665, 2.1665, 1)
+energy_multiplier = 0.4
+
+[sub_resource type="Sky" id="Sky_ga7p2"]
+sky_material = SubResource("ProceduralSkyMaterial_a77a3")
+
+[sub_resource type="Environment" id="Environment_mjats"]
+background_mode = 2
+sky = SubResource("Sky_ga7p2")
+tonemap_mode = 2
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ga7p2"]
+noise_type = 3
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_mjats"]
+seamless = true
+noise = SubResource("FastNoiseLite_ga7p2")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_76duf"]
+render_priority = 0
+shader = ExtResource("2_ga7p2")
+shader_parameter/color1 = Color(0.15, 0, 0, 1)
+shader_parameter/color2 = Color(0.25, 0.0225, 0.0225, 1)
+shader_parameter/noise = SubResource("NoiseTexture3D_mjats")
+
+[sub_resource type="BoxMesh" id="BoxMesh_nha35"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_lou5n"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a77a3"]
+render_priority = 0
+shader = ExtResource("2_lou5n")
+shader_parameter/TwixelAngle = 45.0
+shader_parameter/PixelSize = 5.0
+shader_parameter/Quantize = false
+shader_parameter/Posterize = true
+shader_parameter/ColorSteps = 16
+
+[node name="Showcase" type="Node2D"]
+script = ExtResource("1_ewnj5")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.946779, 0.280707, -0.157525, 0, 0.489382, 0.872069, 0.321886, -0.825656, 0.463337, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_mjats")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(400, 400)
+render_target_update_mode = 4
+
+[node name="Mesh" type="MeshInstance3D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+unique_name_in_owner = true
+transform = Transform3D(0.67262, 0.000312891, -0.740003, -0.000403532, 1, 5.60512e-05, 0.740003, 0.000260904, 0.67262, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_76duf")
+mesh = SubResource("BoxMesh_nha35")
+
+[node name="Camera3D" type="Camera3D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+fov = 30.0
+
+[node name="Quad" type="MeshInstance3D" parent="CanvasLayer/SubViewportContainer/SubViewport"]
+mesh = SubResource("QuadMesh_lou5n")
+surface_material_override/0 = SubResource("ShaderMaterial_a77a3")

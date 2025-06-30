@@ -1,7 +1,6 @@
 shader_type canvas_item;
 
 void vertex() {
-	h
 	// Called for every vertex the material is visible on.
 }
 
