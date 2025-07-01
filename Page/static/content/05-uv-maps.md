@@ -11,3 +11,7 @@ This can be used for various effects, such as making it darker the closer it is 
 COLOR = vec4(COLOR.rgb - UV.x, COLOR.a);
 ```
 *evil godot >:)*
+
+More info on how UV maps can be used can be found in <FUTURE TOPICS>
+
+These were the basics of fragment shaders in Godot. The next chapter will discuss more about vertex shaders.
