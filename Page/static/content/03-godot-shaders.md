@@ -1,4 +1,4 @@
-Godot is a hybrid 2D-3D game engine, which means it supports both 2D and 3D games. To account for this, Godot has two different shader modes:`spatial`, for 3D objects, and `canvas_item`, for 2D objects.
+Godot is a hybrid 2D-3D game engine, which means it supports both 2D and 3D games. To account for this, Godot has two different shader modes: `spatial`, for 3D objects, and `canvas_item`, for 2D objects.
 
 A shader can be labelled as either of these, by using the `shader_type` keyword at the top of the code. In the editor, you can see it's a 2D shader by the fact that it has this at the top:
 
@@ -17,3 +17,5 @@ To apply a shader to a node in Godot, you will have to use the `material` proper
 5. Call the shader whatever you want. In my case, I called it `my_own_shader`:
 <image here>
 6. The shader editor should open at the bottom of the editor, making any changes to the code and saving will update the changes in the viewport
+
+Continue to the next chapter to learn more about fragment shaders.
