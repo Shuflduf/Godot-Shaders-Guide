@@ -12,3 +12,5 @@ In the shader editor on the right, you can see these two functions.
 
 There are also other shader types, such as `light`, `start`, `process`, `sky`, and `fog`. This guide will mainly be focused on vertex and fragment shaders, as they are the most important.
 
+The next topic will cover how shaders are used in Godot specifically.
+
