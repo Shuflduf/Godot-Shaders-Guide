@@ -30,3 +30,5 @@ COLOR.rgb = vec3(COLOR.r, COLOR.r, COLOR.r);
 COLOR = vec4(COLOR.r, COLOR.r, COLOR.r, COLOR.a);
 ```
 Although in these examples I'm using the `COLOR` variable, the same applies to all vectors (`vec2`, `vec3`, etc.).
+
+The next topic will cover built-ins, and will clear out some confusion on what data shaders have access to.
