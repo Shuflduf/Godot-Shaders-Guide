@@ -21,3 +21,5 @@ You can also use UV maps to change the vertex position based on where the vertex
 VERTEX.y *= UV.x + 1.0;
 ```
 Notice how the sprite deforms in this case, since the two triangles that make up the mesh are scaled differently, it affects the sprite not as would be expected.
+
+Compared to fragment shaders, vertex shaders are much simpler, since all they do is adjust the positions of the verticies that make up the mesh. The next chapter will expand more on gGLSL, and what tools you can use to write shaders.
