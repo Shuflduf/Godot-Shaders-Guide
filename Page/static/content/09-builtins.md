@@ -36,9 +36,7 @@ for pixel in pixels:
   # Same goes for every other built-in, and something similar happens with vertex shaders
 ```
 
-
-
 ## More built-ins 
 This list only covers the common built-ins, and are the main ones you would be using for shaders (in 2D, more info on 3D later). However, a full list is available [here](https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/canvas_item_shader.html#built-ins).
 
-This covers the basics of the gGLSL language, and the next chapter will cover more advanced uses of shaders, starting with textures.
+This chapter covers the basics of the gGLSL language, and the next chapter will cover more advanced uses of shaders, starting with textures.

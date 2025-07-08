@@ -1,5 +1,8 @@
 shader_type canvas_item;
 
+uniform sampler2D new_tex;
+uniform float the_float;
+
 void vertex() {
 	// Called for every vertex the material is visible on.
 }

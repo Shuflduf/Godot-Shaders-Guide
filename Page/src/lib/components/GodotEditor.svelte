@@ -24,6 +24,7 @@
 	let currentErrors: Error[] = $state([]);
 	let started: boolean = $state(false);
 	let loading: boolean = $state(false);
+	let uniforms: ShaderUniform[] = $state([]);
 
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
@@ -89,7 +90,8 @@
 		const updateShader = (window as any).updateShader as ((shader: string) => void) | undefined;
 		if (updateShader) {
 			currentErrors = [];
-			updateShader(editor?.state.doc.toString() as string);
+			const res = updateShader(editor?.state.doc.toString() as string);
+			console.log('UPDATED SHADERS:', res);
 		}
 	}
 
@@ -99,17 +101,19 @@
 		if (error.startsWith('SHADER ERROR')) {
 			currentError = new Error(null, error.slice(14));
 		} else if (currentError != null && currentError.line == null) {
-			console.log('DDDDDDDDD:', error.slice(35));
 			currentError.line = parseInt(error.slice(35, -1));
-			console.log('BBBBB:', currentError);
 			currentErrors.push(currentError);
 			currentError = null;
-			console.log('CCCCCCCCC', currentErrors);
 		}
 	}
 
 	function onPrint(text: string) {
 		console.log('Godot:', text);
+		if (text.startsWith('UNIFORMS: ')) {
+			const newUniforms: ShaderUniform[] = JSON.parse(text.slice(10));
+			uniforms = newUniforms;
+			console.log(uniforms);
+		}
 	}
 
 	function onProgress(current: number, total: number) {
@@ -117,26 +121,49 @@
 	}
 </script>
 
-<button class="flex h-[400px] w-4xl max-w-4xl flex-row items-center justify-center" onclick={start}>
-	{#if !started}
-		<div class="flex h-full w-full items-center justify-center bg-slate-300 text-7xl">
-			Start Engine
-		</div>
-	{:else}
-		<canvas
-			id="canvas"
-			width="400"
-			height="400"
-			class="h-full w-[400px] flex-shrink-0 bg-red-500"
-			bind:this={cnvs}
-			>Loading
-		</canvas>
-		<div class="flex h-full max-h-full min-w-0 flex-1 flex-col">
-			<div id="code-editor" class="min-h-0 flex-1 text-left"></div>
-			<tt class="bg-[#1e1e2e] text-center text-white">
-				Press esc before pressing tab to leave editor focus
-			</tt>
-		</div>
-	{/if}
-</button>
+<div class="flex flex-col gap-4">
+	<button
+		class="flex h-[400px] w-4xl max-w-4xl flex-row items-center justify-center"
+		onclick={start}
+	>
+		{#if !started}
+			<div class="flex h-full w-full items-center justify-center bg-slate-300 text-7xl">
+				Start Engine
+			</div>
+		{:else}
+			<canvas
+				id="canvas"
+				width="400"
+				height="400"
+				class="h-full w-[400px] flex-shrink-0 bg-red-500"
+				bind:this={cnvs}
+				>Loading
+			</canvas>
+			<div class="flex h-full max-h-full min-w-0 flex-1 flex-col">
+				<div id="code-editor" class="min-h-0 flex-1 text-left"></div>
+				<tt class="bg-[#1e1e2e] text-center text-white">
+					Press esc before pressing tab to leave editor focus
+				</tt>
+			</div>
+		{/if}
+	</button>
+	<div class="flex flex-row flex-wrap">
+		{#each uniforms as u}
+			<div
+				class="flex flex-row items-center gap-4 rounded-md border border-slate-500 bg-slate-300/10 p-4 shadow-md backdrop-blur-xs"
+			>
+				{u.name}
+				{#if u.type == 'float' || u.type == 'int'}
+					<input
+						type="number"
+						class="rounded-md border px-4 py-2"
+						placeholder="0.0"
+						step={u.type == 'int' ? 1 : 0.001}
+						value={u.value ? u.value : 0.0}
+					/>
+				{/if}
+			</div>
+		{/each}
+	</div>
+</div>
 <!-- <textarea class="w-xl" bind:value={shaderText}></textarea> -->
