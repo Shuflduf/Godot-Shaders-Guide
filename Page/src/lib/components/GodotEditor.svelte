@@ -147,7 +147,7 @@
 			</div>
 		{/if}
 	</button>
-	<div class="flex flex-row flex-wrap">
+	<div class="flex flex-row flex-wrap gap-4">
 		{#each uniforms as u}
 			<div
 				class="flex flex-row items-center gap-4 rounded-md border border-slate-500 bg-slate-300/10 p-4 shadow-md backdrop-blur-xs"
@@ -161,6 +161,8 @@
 						step={u.type == 'int' ? 1 : 0.001}
 						value={u.value ? u.value : 0.0}
 					/>
+				{:else if u.type == 'sampler2D'}
+					<input type="file" />
 				{/if}
 			</div>
 		{/each}
