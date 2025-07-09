@@ -24,7 +24,7 @@
 	let started: boolean = $state(false);
 	let loading: boolean = $state(false);
 	let uniforms: ShaderUniform[] = $state([]);
-	let uniformValues: { [key: string]: number } = $state({});
+	let uniformValues: { [key: string]: any } = $state({});
 
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
@@ -127,12 +127,26 @@
 		console.log(current, total);
 	}
 
+	async function genFileData(file: File) {
+		return {
+			bytes: await file.bytes(),
+			type: file.type
+		};
+	}
+
 	function onNumberUniformChanged(uniformName: string) {
 		console.log('NEW:', uniformName, uniformValues[uniformName]);
 		const updateUniforms = (window as any).updateUniforms as ((uniforms: any) => void) | undefined;
 		if (updateUniforms) {
 			updateUniforms(JSON.stringify(uniformValues));
 		}
+	}
+
+	async function onTextureUniformChanged(uniformName: string) {
+		const file: File = uniformValues[uniformName] as File;
+		const type = file.type;
+		const bytes = await file.bytes();
+		console.log('FILE:', uniformName, bytes, type);
 	}
 </script>
 
@@ -179,7 +193,12 @@
 						oninput={(e) => (uniformValues[u.name] = Number(e.target.value))}
 					/>
 				{:else if u.type == 'sampler2D'}
-					<input type="file" />
+					<input
+						type="file"
+						onchange={() => onTextureUniformChanged(u.name)}
+						accept=".jpg,.ktx,.png,.svg,.tga,.webp"
+						oninput={(e) => (uniformValues[u.name] = genFileData(e.target.files[0]))}
+					/>
 				{/if}
 			</div>
 		{/each}
