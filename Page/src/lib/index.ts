@@ -2,12 +2,10 @@
 class ShaderUniform {
   name: string;
   type: string;
-  value: any;
+  value: any = null;
 
   constructor(name: string, type: string) {
     this.name = name;
     this.type = type;
-
-    this.value = null
   }
 }

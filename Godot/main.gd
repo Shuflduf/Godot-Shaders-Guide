@@ -1,18 +1,35 @@
 extends Node2D
 
-var _callback_ref = JavaScriptBridge.create_callback(_update_shader)
+var _update_shader_ref = JavaScriptBridge.create_callback(_update_shader)
+var _update_uniforms_ref = JavaScriptBridge.create_callback(_update_uniforms)
 var console = JavaScriptBridge.get_interface("console")
 
 func _ready() -> void:
 	var window = JavaScriptBridge.get_interface("window")
-	window.updateShader = _callback_ref
-	console.log(window.updateShader)
+	window.updateShader = _update_shader_ref
+	window.updateUniforms = _update_uniforms_ref
+	#console.log(window.updateShader)
 
 func _update_shader(args):
-	
 	var event = args[0]
-	print("UNIFORMS: ", JSON.stringify(get_uniforms_from_shader_code(event)))
-	$Sprite2D.get_material().get_shader().set_code(event)
+	var uniforms = get_uniforms_from_shader_code(event)
+	var shader: ShaderMaterial = $Sprite2D.get_material()
+	print("UNIFORMS: ", JSON.stringify(uniforms))
+	for u in uniforms:
+		if u["value"]:
+			shader.set_shader_parameter(u["name"], u["value"])
+			
+	shader.get_shader().set_code(event)
+	
+func _update_uniforms(args):
+	var event = args[0]
+	var data = JSON.parse_string(event)
+	var shader: ShaderMaterial = $Sprite2D.get_material()
+	for key in data:
+		print("setting: ", key, data[key])
+		shader.set_shader_parameter(key, data[key])
+	
+	print("WOOOWWW: ", data)
 
 static func get_uniforms_from_shader_code(shader_code: String) -> Array:
 	var uniforms = []

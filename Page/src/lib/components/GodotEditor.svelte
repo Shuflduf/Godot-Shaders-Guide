@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { basicSetup, EditorView } from 'codemirror';
 	import { keymap } from '@codemirror/view';
-	import { onMount } from 'svelte';
 	import { indentWithTab } from '@codemirror/commands';
 	import { catppuccinMocha } from '@catppuccin/codemirror';
 	import { cpp } from '@codemirror/lang-cpp';
@@ -25,6 +24,7 @@
 	let started: boolean = $state(false);
 	let loading: boolean = $state(false);
 	let uniforms: ShaderUniform[] = $state([]);
+	let uniformValues: { [key: string]: number } = $state({});
 
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
@@ -111,6 +111,13 @@
 		console.log('Godot:', text);
 		if (text.startsWith('UNIFORMS: ')) {
 			const newUniforms: ShaderUniform[] = JSON.parse(text.slice(10));
+			uniformValues = {};
+			newUniforms.forEach((u) => {
+				if (u.value) {
+					uniformValues[u.name] = u.value;
+				}
+			});
+
 			uniforms = newUniforms;
 			console.log(uniforms);
 		}
@@ -118,6 +125,14 @@
 
 	function onProgress(current: number, total: number) {
 		console.log(current, total);
+	}
+
+	function onNumberUniformChanged(uniformName: string) {
+		console.log('NEW:', uniformName, uniformValues[uniformName]);
+		const updateUniforms = (window as any).updateUniforms as ((uniforms: any) => void) | undefined;
+		if (updateUniforms) {
+			updateUniforms(JSON.stringify(uniformValues));
+		}
 	}
 </script>
 
@@ -155,11 +170,13 @@
 				{u.name}
 				{#if u.type == 'float' || u.type == 'int'}
 					<input
+						onchange={() => onNumberUniformChanged(u.name)}
 						type="number"
 						class="rounded-md border px-4 py-2"
 						placeholder="0.0"
 						step={u.type == 'int' ? 1 : 0.001}
-						value={u.value ? u.value : 0.0}
+						value={uniformValues[u.name]}
+						oninput={(e) => (uniformValues[u.name] = Number(e.target.value))}
 					/>
 				{:else if u.type == 'sampler2D'}
 					<input type="file" />
