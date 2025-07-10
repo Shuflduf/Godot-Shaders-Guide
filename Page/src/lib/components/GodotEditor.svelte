@@ -146,14 +146,6 @@
 			);
 		}
 	}
-
-	function onNumberUniformInput(value: number, uniformName: string) {
-		// safeUpdateUniforms({ uniform: uniformName, value: value });
-	}
-
-	async function onTextureUniformInput(file: File, uniformName: string) {
-		console.log('FILE:', uniformName, file);
-	}
 </script>
 
 <div class="flex flex-col gap-4">
@@ -191,19 +183,33 @@
 				{#if u.type == 'float' || u.type == 'int'}
 					<input
 						type="number"
-						class="rounded-md border px-4 py-2"
-						placeholder="0.0"
-						step={u.type == 'int' ? 1 : 0.001}
+						class="w-24 rounded-md border px-4 py-2"
+						placeholder={u.type}
+						step="0.001"
 						value={uniformValues[u.name]}
 						oninput={(e) => safeUpdateUniforms(Number(e.target.value), u.name, u.type)}
 					/>
 				{:else if u.type == 'sampler2D'}
 					<input
 						type="file"
-						accept=".jpg,.ktx,.png,.svg,.tga,.webp"
+						accept=".jpg,.png,.svg,.tga,.webp"
 						oninput={async (e) =>
 							safeUpdateUniforms(await genFileData(e.target.files[0]), u.name, u.type)}
 					/>
+				{:else if u.type.startsWith('vec') && [2, 3, 4].includes(Number(u.type.at(-1)))}
+					{#each ['x', 'y', 'z', 'w'].slice(0, Number(u.type.at(-1))) as dim}
+						<input
+							type="number"
+							placeholder={dim}
+							class="w-24 rounded-md border px-4 py-2"
+							oninput={(e) =>
+								safeUpdateUniforms(
+									{ dimension: dim, value: Number(e.target.value) },
+									u.name,
+									u.type
+								)}
+						/>
+					{/each}
 				{/if}
 			</div>
 		{/each}

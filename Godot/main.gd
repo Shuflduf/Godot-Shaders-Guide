@@ -24,6 +24,7 @@ func _update_shader(args):
 func _update_uniforms(args):
 	var event = args[0]
 	var update_data = JSON.parse_string(event)
+	var type: String = update_data["type"]
 	print("WOOOWWW: ", update_data)
 	
 	var shader: ShaderMaterial = $Sprite2D.get_material()
@@ -34,12 +35,47 @@ func _update_uniforms(args):
 	if update_data["type"] == "sampler2D":
 		var bytes = PackedByteArray(update_data["data"]["bytes"])
 		var img = Image.new()
-		var err = img.load_png_from_buffer(bytes)
+		match update_data["data"]["type"]:
+			"image/png":
+				img.load_png_from_buffer(bytes)
+			"image/jpeg":
+				img.load_jpg_from_buffer(bytes)
+			"image/webp":
+				img.load_webp_from_buffer(bytes)
+			"image/svg+xml":
+				img.load_svg_from_buffer(bytes)
+		
 		var img_tex = ImageTexture.create_from_image(img)
 		shader.set_shader_parameter(update_data["uniformName"], img_tex)
 		
-		var test: ImageTexture = shader.get_shader_parameter(update_data["uniformName"])
-
+		#var test: ImageTexture = shader.get_shader_parameter(update_data["uniformName"])
+	if type.begins_with("vec") and int(type[-1]) in [2, 3, 4]:
+		var dim: String = update_data["data"]["dimension"]
+		var val: float = update_data["data"]["value"]
+		print(JSON.stringify(shader.shader.code))
+		
+		var vec = shader.get_shader_parameter(update_data["uniformName"])
+		print("VECC: ", vec)
+		if vec == null:
+			match dim:
+				2:
+					vec = Vector2(0, 0)
+				3:
+					vec = Vector3(0, 0, 0)
+				4:
+					vec = Vector4(0, 0, 0, 0)
+			print("VECC: ", vec)
+		
+		match dim:
+			"x":
+				vec.x = val
+			"y":
+				vec.y = val
+			"z":
+				vec.z = val
+			"w":
+				vec.w = val
+		shader.set_shader_parameter(update_data["uniformName"], vec)
 
 static func get_uniforms_from_shader_code(shader_code: String) -> Array:
 	var uniforms = []

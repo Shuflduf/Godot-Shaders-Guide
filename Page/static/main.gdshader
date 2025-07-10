@@ -1,6 +1,6 @@
 shader_type canvas_item;
 
-uniform sampler2D testing_texture;
+uniform vec4 testing;
 
 void vertex() {
   // Called for every vertex the material is visible on.

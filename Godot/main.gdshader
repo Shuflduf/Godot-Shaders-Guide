@@ -1,7 +1,7 @@
 shader_type canvas_item;
 
 uniform sampler2D new_tex;
-uniform float the_float;
+uniform vec4 testing = vec4(69, 69, 69, 69);
 
 void vertex() {
 	// Called for every vertex the material is visible on.

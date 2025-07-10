@@ -7,7 +7,7 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h2yge"]
 shader = ExtResource("1_0xm2m")
 shader_parameter/new_tex = ExtResource("1_ig7tw")
-shader_parameter/the_float = 0.0
+shader_parameter/testing = Vector4(0, 0, 0, 0)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_h2yge")
