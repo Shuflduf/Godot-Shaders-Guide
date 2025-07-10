@@ -11,25 +11,38 @@ func _ready() -> void:
 	#console.log(window.updateShader)
 
 func _update_shader(args):
-	var event = args[0]
-	var uniforms = get_uniforms_from_shader_code(event)
+	var code = args[0]
+	var uniforms = get_uniforms_from_shader_code(code)
 	var shader: ShaderMaterial = $Sprite2D.get_material()
 	print("UNIFORMS: ", JSON.stringify(uniforms))
-	for u in uniforms:
-		if u["value"]:
+	for u: Dictionary in uniforms:
+		if u.has("value"):
 			shader.set_shader_parameter(u["name"], u["value"])
 			
-	shader.get_shader().set_code(event)
+	shader.get_shader().set_code(code)
 	
 func _update_uniforms(args):
 	var event = args[0]
-	var data = JSON.parse_string(event)
-	var shader: ShaderMaterial = $Sprite2D.get_material()
-	for key in data:
-		print("setting: ", key, data[key])
-		shader.set_shader_parameter(key, data[key])
+	var update_data = JSON.parse_string(event)
+	print("WOOOWWW: ", update_data)
 	
-	print("WOOOWWW: ", data)
+	var shader: ShaderMaterial = $Sprite2D.get_material()
+	if update_data["type"] in ["float", "int"]:
+		print("WERE SO BACK")
+		shader.set_shader_parameter(update_data["uniformName"], update_data["data"])
+		
+	if update_data["type"] == "sampler2D":
+		var bytes = PackedByteArray(update_data["data"]["bytes"])
+		var img = Image.new()
+		var err = img.load_png_from_buffer(bytes)
+		print("IMGG: ", err, img.get_height())
+		var img_tex = ImageTexture.create_from_image(img)
+		shader.set_shader_parameter(update_data["uniformName"], img_tex)
+	#for key in data:
+		#print("setting: ", key, data[key])
+		#shader.set_shader_parameter(key, data[key])
+	#
+	
 
 static func get_uniforms_from_shader_code(shader_code: String) -> Array:
 	var uniforms = []
