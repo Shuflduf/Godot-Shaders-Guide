@@ -17,7 +17,10 @@ func _update_shader(args):
 	print("UNIFORMS: ", JSON.stringify(uniforms))
 	for u: Dictionary in uniforms:
 		if u.has("value"):
-			shader.set_shader_parameter(u["name"], u["value"])
+			if u["type"] in ["int", "float"]:
+				shader.set_shader_parameter(u["name"], u["value"])
+			elif u["type"].begins_with("vec"):
+				shader.set_shader_parameter(u["name"], VecUniform.arr_to_gd(u["value"]))
 			
 	shader.get_shader().set_code(code)
 	
@@ -54,19 +57,11 @@ func _update_uniforms(args):
 		#var test: ImageTexture = shader.get_shader_parameter(update_data["uniformName"])
 	if type.begins_with("vec") and int(type[-1]) in [2, 3, 4]:
 		var dim: String = data["dimension"]
-		var val: float = data["value"]
-		print(JSON.stringify(shader.shader.code))
+		var vec_comp: int = int(type[-1])
+		var val = data["value"]
 		
 		var vec = shader.get_shader_parameter(uniform_name)
-		if vec == null:
-			match dim:
-				2:
-					vec = Vector2(0, 0)
-				3:
-					vec = Vector3(0, 0, 0)
-				4:
-					vec = Vector4(0, 0, 0, 0)
-		
+
 		match dim:
 			"x":
 				vec.x = val
@@ -76,7 +71,7 @@ func _update_uniforms(args):
 				vec.z = val
 			"w":
 				vec.w = val
-				
+		
 		shader.set_shader_parameter(uniform_name, vec)
 
 static func get_uniforms_from_shader_code(shader_code: String) -> Array:
@@ -94,7 +89,10 @@ static func get_uniforms_from_shader_code(shader_code: String) -> Array:
 		}
 		
 		if result.get_string(3) != "":
-			uniform_data["value"] = result.get_string(3).strip_edges()
+			var value = result.get_string(3).strip_edges()
+			if value.begins_with("vec"):
+				value = value.substr(5, value.length() - 6)
+			uniform_data["value"] = Array(value.split(", ")).map(func (e: String): return float(e))
 		
 		uniforms.append(uniform_data)
 	

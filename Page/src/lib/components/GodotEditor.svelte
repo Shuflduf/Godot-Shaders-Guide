@@ -115,11 +115,15 @@
 			newUniforms.forEach((u) => {
 				if (u.value) {
 					let val = u.value;
-					if (val.startsWith('vec')) {
-						const vals = val.slice(5, -1);
-						const val_arr = JSON.parse(`[${vals}]`);
+					let type = u.type;
+					if (type.startsWith('vec')) {
+						// const vals = val.slice(5, -1);
+						// const val_arr = JSON.parse(`[${vals}]`);
+						// const val_arr = (val as string).split(', ');
+						// const val_arr = JSON.parse(val);
+						const val_arr = val;
 						val = Object.fromEntries(
-							val_arr.map((v: number, i: number) => [['x', 'y', 'z', 'w'][i], v])
+							val_arr.map((v: string, i: number) => [['x', 'y', 'z', 'w'][i], v])
 						);
 
 						console.log(val);
@@ -190,7 +194,7 @@
 								type="number"
 								class="w-24 rounded-md border px-4 py-2"
 								placeholder={u.type}
-								step="0.001"
+								step="1"
 								value={uniformValues[u.name]}
 								oninput={(e) => safeUpdateUniforms(Number(e.target.value), u.name, u.type)}
 							/>
@@ -207,7 +211,7 @@
 									type="number"
 									placeholder={dim}
 									class="w-24 rounded-md border px-4 py-2"
-									value={uniformValues[u.name][dim]}
+									value={uniformValues[u.name] ? uniformValues[u.name][dim] : 0}
 									oninput={(e) =>
 										safeUpdateUniforms(
 											{ dimension: dim, value: Number(e.target.value) },
