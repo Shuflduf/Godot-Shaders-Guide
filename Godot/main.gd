@@ -35,14 +35,11 @@ func _update_uniforms(args):
 		var bytes = PackedByteArray(update_data["data"]["bytes"])
 		var img = Image.new()
 		var err = img.load_png_from_buffer(bytes)
-		print("IMGG: ", err, img.get_height())
 		var img_tex = ImageTexture.create_from_image(img)
 		shader.set_shader_parameter(update_data["uniformName"], img_tex)
-	#for key in data:
-		#print("setting: ", key, data[key])
-		#shader.set_shader_parameter(key, data[key])
-	#
-	
+		
+		var test: ImageTexture = shader.get_shader_parameter(update_data["uniformName"])
+
 
 static func get_uniforms_from_shader_code(shader_code: String) -> Array:
 	var uniforms = []
@@ -58,7 +55,6 @@ static func get_uniforms_from_shader_code(shader_code: String) -> Array:
 			"name": result.get_string(2)
 		}
 		
-		# Add value field if a default value exists
 		if result.get_string(3) != "":
 			uniform_data["value"] = result.get_string(3).strip_edges()
 		
