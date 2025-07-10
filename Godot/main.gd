@@ -24,18 +24,21 @@ func _update_shader(args):
 func _update_uniforms(args):
 	var event = args[0]
 	var update_data = JSON.parse_string(event)
+	
 	var type: String = update_data["type"]
+	var uniform_name: String = update_data["uniformName"]
+	var data: Variant = update_data["data"]
 	print("WOOOWWW: ", update_data)
 	
 	var shader: ShaderMaterial = $Sprite2D.get_material()
-	if update_data["type"] in ["float", "int"]:
+	if type in ["float", "int"]:
 		print("WERE SO BACK")
-		shader.set_shader_parameter(update_data["uniformName"], update_data["data"])
+		shader.set_shader_parameter(uniform_name, data)
 		
-	if update_data["type"] == "sampler2D":
-		var bytes = PackedByteArray(update_data["data"]["bytes"])
+	if type == "sampler2D":
+		var bytes = PackedByteArray(data["bytes"])
 		var img = Image.new()
-		match update_data["data"]["type"]:
+		match data["type"]:
 			"image/png":
 				img.load_png_from_buffer(bytes)
 			"image/jpeg":
@@ -46,16 +49,15 @@ func _update_uniforms(args):
 				img.load_svg_from_buffer(bytes)
 		
 		var img_tex = ImageTexture.create_from_image(img)
-		shader.set_shader_parameter(update_data["uniformName"], img_tex)
+		shader.set_shader_parameter(uniform_name, img_tex)
 		
 		#var test: ImageTexture = shader.get_shader_parameter(update_data["uniformName"])
 	if type.begins_with("vec") and int(type[-1]) in [2, 3, 4]:
-		var dim: String = update_data["data"]["dimension"]
-		var val: float = update_data["data"]["value"]
+		var dim: String = data["dimension"]
+		var val: float = data["value"]
 		print(JSON.stringify(shader.shader.code))
 		
-		var vec = shader.get_shader_parameter(update_data["uniformName"])
-		print("VECC: ", vec)
+		var vec = shader.get_shader_parameter(uniform_name)
 		if vec == null:
 			match dim:
 				2:
@@ -64,7 +66,6 @@ func _update_uniforms(args):
 					vec = Vector3(0, 0, 0)
 				4:
 					vec = Vector4(0, 0, 0, 0)
-			print("VECC: ", vec)
 		
 		match dim:
 			"x":
@@ -75,7 +76,8 @@ func _update_uniforms(args):
 				vec.z = val
 			"w":
 				vec.w = val
-		shader.set_shader_parameter(update_data["uniformName"], vec)
+				
+		shader.set_shader_parameter(uniform_name, vec)
 
 static func get_uniforms_from_shader_code(shader_code: String) -> Array:
 	var uniforms = []

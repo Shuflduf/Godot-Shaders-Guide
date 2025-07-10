@@ -5,6 +5,7 @@
 	import { catppuccinMocha } from '@catppuccin/codemirror';
 	import { cpp } from '@codemirror/lang-cpp';
 	import { linter, lintGutter } from '@codemirror/lint';
+	import { SHUFL_BOX } from '$lib/styles';
 
 	class Error {
 		line: number | null;
@@ -113,7 +114,17 @@
 			uniformValues = {};
 			newUniforms.forEach((u) => {
 				if (u.value) {
-					uniformValues[u.name] = u.value;
+					let val = u.value;
+					if (val.startsWith('vec')) {
+						const vals = val.slice(5, -1);
+						const val_arr = JSON.parse(`[${vals}]`);
+						val = Object.fromEntries(
+							val_arr.map((v: number, i: number) => [['x', 'y', 'z', 'w'][i], v])
+						);
+
+						console.log(val);
+					}
+					uniformValues[u.name] = val;
 				}
 			});
 
@@ -148,71 +159,68 @@
 	}
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex w-full flex-col">
 	<button
-		class="flex h-[400px] w-4xl max-w-4xl flex-row items-center justify-center"
+		class="flex h-12 w-full flex-row items-center justify-center bg-slate-300 text-xl"
 		onclick={start}
 	>
 		{#if !started}
-			<div class="flex h-full w-full items-center justify-center bg-slate-300 text-7xl">
-				Start Engine
-			</div>
-		{:else}
-			<canvas
-				id="canvas"
-				width="400"
-				height="400"
-				class="h-full w-[400px] flex-shrink-0 bg-red-500"
-				bind:this={cnvs}
-				>Loading
-			</canvas>
-			<div class="flex h-full max-h-full min-w-0 flex-1 flex-col">
-				<div id="code-editor" class="min-h-0 flex-1 text-left"></div>
-				<tt class="bg-[#1e1e2e] text-center text-white">
-					Press esc before pressing tab to leave editor focus
-				</tt>
-			</div>
+			Start Engine
 		{/if}
 	</button>
-	<div class="flex flex-row flex-wrap gap-4">
-		{#each uniforms as u}
-			<div
-				class="flex flex-row items-center gap-4 rounded-md border border-slate-500 bg-slate-300/10 p-4 shadow-md backdrop-blur-xs"
-			>
-				{u.name}
-				{#if u.type == 'float' || u.type == 'int'}
-					<input
-						type="number"
-						class="w-24 rounded-md border px-4 py-2"
-						placeholder={u.type}
-						step="0.001"
-						value={uniformValues[u.name]}
-						oninput={(e) => safeUpdateUniforms(Number(e.target.value), u.name, u.type)}
-					/>
-				{:else if u.type == 'sampler2D'}
-					<input
-						type="file"
-						accept=".jpg,.png,.svg,.tga,.webp"
-						oninput={async (e) =>
-							safeUpdateUniforms(await genFileData(e.target.files[0]), u.name, u.type)}
-					/>
-				{:else if u.type.startsWith('vec') && [2, 3, 4].includes(Number(u.type.at(-1)))}
-					{#each ['x', 'y', 'z', 'w'].slice(0, Number(u.type.at(-1))) as dim}
-						<input
-							type="number"
-							placeholder={dim}
-							class="w-24 rounded-md border px-4 py-2"
-							oninput={(e) =>
-								safeUpdateUniforms(
-									{ dimension: dim, value: Number(e.target.value) },
-									u.name,
-									u.type
-								)}
-						/>
-					{/each}
-				{/if}
+	{#if started}
+		<div class="flex flex-1 flex-col overflow-y-auto">
+			<div class="flex max-h-[400px] flex-row">
+				<canvas id="canvas" width="400" height="400" class="bg-red-500" bind:this={cnvs}></canvas>
+				<div class="flex h-full flex-1 flex-col">
+					<!-- if you remove min-h-0 it doesnt work for some reason -->
+					<div id="code-editor" class="min-h-0 flex-1 text-left"></div>
+					<tt class="bg-[#1e1e2e] text-center text-white">
+						Press esc before pressing tab to leave editor focus
+					</tt>
+				</div>
 			</div>
-		{/each}
-	</div>
+
+			<div class="mt-4 flex flex-1 flex-row flex-wrap gap-4 overflow-y-scroll">
+				{#each uniforms as u}
+					<div class="flex {SHUFL_BOX} h-fit flex-row items-center gap-4">
+						{u.name}
+						{#if u.type == 'float' || u.type == 'int'}
+							<input
+								type="number"
+								class="w-24 rounded-md border px-4 py-2"
+								placeholder={u.type}
+								step="0.001"
+								value={uniformValues[u.name]}
+								oninput={(e) => safeUpdateUniforms(Number(e.target.value), u.name, u.type)}
+							/>
+						{:else if u.type == 'sampler2D'}
+							<input
+								type="file"
+								accept=".jpg,.png,.svg,.tga,.webp"
+								oninput={async (e) =>
+									safeUpdateUniforms(await genFileData(e.target.files[0]), u.name, u.type)}
+							/>
+						{:else if u.type.startsWith('vec') && [2, 3, 4].includes(Number(u.type.at(-1)))}
+							{#each ['x', 'y', 'z', 'w'].slice(0, Number(u.type.at(-1))) as dim}
+								<input
+									type="number"
+									placeholder={dim}
+									class="w-24 rounded-md border px-4 py-2"
+									value={uniformValues[u.name][dim]}
+									oninput={(e) =>
+										safeUpdateUniforms(
+											{ dimension: dim, value: Number(e.target.value) },
+											u.name,
+											u.type
+										)}
+								/>
+							{/each}
+						{/if}
+					</div>
+				{/each}
+			</div>
+		</div>
+	{/if}
 </div>
 <!-- <textarea class="w-xl" bind:value={shaderText}></textarea> -->

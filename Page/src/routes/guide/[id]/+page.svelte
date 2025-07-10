@@ -8,9 +8,9 @@
 
 <title>{data.name}</title>
 <div class="fixed flex h-screen w-screen flex-col gap-4 p-4">
-	<nav class="h-24 w-full {SHUFL_BOX}"></nav>
-	<div class="flex h-full flex-row gap-4">
-		<main class="prose h-full max-h-[calc(80vh)] w-sm {SHUFL_BOX} overflow-y-auto">
+	<nav class="min-h-24 w-full {SHUFL_BOX}"></nav>
+	<div class="flex h-full max-h-[calc(100vh-9rem)] flex-row gap-4">
+		<main class="prose h-full w-md max-w-md min-w-md {SHUFL_BOX} overflow-y-auto">
 			{@html data.html}
 			<a href="/guide/{data.next}">
 				<button
