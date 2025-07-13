@@ -23,6 +23,7 @@
 		setInterval(ensureHead, 1000);
 	});
 
+	// this is here because godot overwrites the favicon and title by default for some reason
 	function ensureHead() {
 		document.title = data.name ? data.name : 'Shaders Guide';
 
