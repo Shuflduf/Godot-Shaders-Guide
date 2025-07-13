@@ -1,6 +1,7 @@
 <script lang="ts">
 	import GodotEditor from '$lib/components/GodotEditor.svelte';
 	import { SHUFL_BOX } from '$lib/styles';
+	import { onMount } from 'svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -17,9 +18,26 @@
 		e.preventDefault();
 		(e.currentTarget as HTMLElement).scrollLeft += e.deltaY;
 	}
+
+	onMount(() => {
+		setInterval(ensureHead, 1000);
+	});
+
+	function ensureHead() {
+		document.title = data.name ? data.name : 'Shaders Guide';
+
+		const favicon = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
+		if (favicon) {
+			favicon.parentNode?.removeChild(favicon);
+		}
+
+		const newFavicon = document.createElement('link');
+		newFavicon.rel = 'icon';
+		newFavicon.href = '/favicon.png';
+		document.head.appendChild(newFavicon);
+	}
 </script>
 
-<title>{data.name}</title>
 <div class="fixed flex h-screen w-screen flex-col gap-4 p-4">
 	<div class="flex gap-4">
 		<a href="/" aria-label="Home">
