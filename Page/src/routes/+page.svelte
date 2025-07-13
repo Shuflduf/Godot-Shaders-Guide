@@ -1,36 +1,55 @@
 <script>
 	import VidSlider from '$lib/components/VidSlider.svelte';
+	import { onMount } from 'svelte';
+	import { fade, fly, slide } from 'svelte/transition';
+
+	let loaded = $state(false);
+
+	onMount(() => {
+		loaded = true;
+	});
 </script>
 
 <div class="flex h-[36rem] w-screen items-center justify-evenly">
-	<div>
-		<h1 class="font-[Arvo] text-5xl font-bold">Godot Shaders Guide</h1>
-		<h2 class="text-lg italic">
-			A free and interactive tutorial to learn the Godot shaders system
-		</h2>
-	</div>
-	<img src="icon.png" class="w-80" alt="godot shaders icon" />
+	{#if loaded}
+		<div>
+			<h1 class="font-[Arvo] text-5xl font-bold" transition:fly={{ duration: 1000, y: 50 }}>
+				Godot Shaders Guide
+			</h1>
+			<h2 class="text-lg italic" transition:fly={{ duration: 1000, y: 50, delay: 100 }}>
+				A free and interactive tutorial to learn the Godot shaders system
+			</h2>
+		</div>
+		<img
+			src="icon.png"
+			class="w-80"
+			alt="godot shaders icon"
+			transition:slide={{ duration: 1000, axis: 'x' }}
+		/>
+	{/if}
 </div>
 
 <div class="absolute -left-20 -z-20 h-[34rem] w-[200vw] rotate-3 bg-slate-300 shadow-md"></div>
 <div class="relative flex h-[30rem] w-screen items-center justify-evenly pb-16">
-	<div class="flex flex-col gap-2">
-		<VidSlider src1="/after.webm" src2="/before.webm"></VidSlider>
-		<!-- <video src="/after.webm" autoplay loop><track kind="captions" /></video> -->
-		<!-- <video src="/before.webm" autoplay loop><track kind="captions" /></video> -->
-		<p class="text-center font-[Arvo] italic">Hover me!</p>
-	</div>
-	<div>
-		<h1 class="mb-2 text-center font-[Arvo] text-3xl font-bold">What are Godot shaders?</h1>
-		<p class="max-w-2xl">
-			Godot shaders are small programs written in Godot's shading language that run on the GPU to
-			control how objects are rendered. They allow developers to create custom visual effects,
-			materials, lighting, and post-processing by manipulating how surfaces, sprites, and 2D/3D
-			objects appear in the engine. Shaders in Godot can be used for a wide range of effects, from
-			simple color changes to complex animations, procedural textures, and dynamic lighting, giving
-			artists and programmers fine-grained control over the look and feel of their games.
-		</p>
-	</div>
+	{#if loaded}
+		<div class="flex flex-col gap-2" transition:fly={{ duration: 1000, x: 400, delay: 800 }}>
+			<VidSlider src1="/after.webm" src2="/before.webm"></VidSlider>
+			<!-- <video src="/after.webm" autoplay loop><track kind="captions" /></video> -->
+			<!-- <video src="/before.webm" autoplay loop><track kind="captions" /></video> -->
+			<p class="text-center font-[Arvo] italic">Hover me!</p>
+		</div>
+		<div transition:fly={{ duration: 1000, x: 400, delay: 900 }}>
+			<h1 class="mb-2 text-center font-[Arvo] text-3xl font-bold">What are Godot shaders?</h1>
+			<p class="max-w-2xl">
+				Godot shaders are small programs written in Godot's shading language that run on the GPU to
+				control how objects are rendered. They allow developers to create custom visual effects,
+				materials, lighting, and post-processing by manipulating how surfaces, sprites, and 2D/3D
+				objects appear in the engine. Shaders in Godot can be used for a wide range of effects, from
+				simple color changes to complex animations, procedural textures, and dynamic lighting,
+				giving artists and programmers fine-grained control over the look and feel of their games.
+			</p>
+		</div>
+	{/if}
 </div>
 <div class="flex h-[26rem] w-screen items-center justify-evenly pb-16">
 	<div class="flex flex-col items-center">

@@ -6,6 +6,7 @@
 	import { cpp } from '@codemirror/lang-cpp';
 	import { linter, lintGutter } from '@codemirror/lint';
 	import { SHUFL_BOX } from '$lib/styles';
+	import { onMount } from 'svelte';
 
 	class Error {
 		line: number | null;
@@ -88,9 +89,9 @@
 		loadingThings = false;
 	}
 
-	// onMount(async () => {
-	// 	await start();
-	// });
+	onMount(async () => {
+		await start();
+	});
 
 	function safeUpdateShader() {
 		const updateShader = (window as any).updateShader as ((shader: string) => void) | undefined;
