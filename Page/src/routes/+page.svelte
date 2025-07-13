@@ -1,5 +1,4 @@
 <script>
-	import GodotEditor from '$lib/components/GodotEditor.svelte';
 	import VidSlider from '$lib/components/VidSlider.svelte';
 </script>
 
@@ -13,7 +12,8 @@
 	<img src="icon.png" class="w-80" alt="godot shaders icon" />
 </div>
 
-<div class="flex h-[26rem] w-screen items-center justify-evenly bg-slate-300">
+<div class="absolute -left-20 -z-20 h-[34rem] w-[200vw] rotate-3 bg-slate-300 shadow-md"></div>
+<div class="relative flex h-[30rem] w-screen items-center justify-evenly pb-16">
 	<div class="flex flex-col gap-2">
 		<VidSlider src1="/after.webm" src2="/before.webm"></VidSlider>
 		<!-- <video src="/after.webm" autoplay loop><track kind="captions" /></video> -->
@@ -32,8 +32,8 @@
 		</p>
 	</div>
 </div>
-<div class="flex h-[26rem] w-screen items-center justify-evenly bg-slate-300">
-	<div>
+<div class="flex h-[26rem] w-screen items-center justify-evenly pb-16">
+	<div class="flex flex-col items-center">
 		<h1 class="mb-2 text-center font-[Arvo] text-3xl font-bold">Guide Contents</h1>
 		<ul class="list-disc">
 			<li>Explanation of Shaders</li>
@@ -43,8 +43,19 @@
 			<li>Post-Processing</li>
 			<li>Integration with Godot Scripts</li>
 		</ul>
+		<a
+			class="mt-8 cursor-pointer rounded-md bg-blue-500 px-4 py-2 font-[Arvo] text-xl text-white shadow-md transition hover:bg-blue-400 hover:shadow-lg"
+			href="/guide/01-intro">Get Started Now</a
+		>
 	</div>
+	<img
+		src="/guide.png"
+		class="h-[350px] shadow-md transition hover:scale-105 hover:shadow-lg"
+		alt="guide"
+	/>
 </div>
+<div class="absolute top-[60rem] -left-20 -z-10 h-[30rem] w-[200vw] -rotate-3 bg-slate-400"></div>
+<div class="relative h-20 w-screen scale-y-200 bg-slate-400"></div>
 <!-- <div class="flex h-screen w-screen flex-col items-center justify-center gap-8"> -->
 <!-- 	<h1 class="text-center text-3xl font-bold"> -->
 <!-- 		LOOK ITS THE ICON.SVG FROM HIT GAME ENGINE GODOT GAME ENGINE -->

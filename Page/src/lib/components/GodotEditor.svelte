@@ -17,6 +17,7 @@
 		}
 	}
 
+	let loadingThings: boolean = $state(false);
 	let cnvs = $state();
 	let shaderText: string = $state('fuck you');
 	let editor: EditorView | null = $state(null);
@@ -26,6 +27,7 @@
 	let loading: boolean = $state(false);
 	let uniforms: ShaderUniform[] = $state([]);
 	let uniformValues: { [key: string]: any } = $state({});
+	let defaultUniformValues: { [key: string]: any } = $state({});
 
 	const wasm = '/godot_exports/godot';
 	const pck = '/godot_exports/godot.pck';
@@ -36,6 +38,7 @@
 		}
 		started = true;
 		loading = true;
+		loadingThings = true;
 		shaderText = await (await fetch('/main.gdshader')).text();
 		editor = new EditorView({
 			doc: shaderText,
@@ -80,7 +83,9 @@
 			onProgress
 		});
 		await engine.startGame();
+		safeUpdateShader();
 		loading = false;
+		loadingThings = false;
 	}
 
 	// onMount(async () => {
@@ -111,12 +116,14 @@
 		console.log('Godot:', text);
 		if (text.startsWith('UNIFORMS: ')) {
 			const newUniforms: ShaderUniform[] = JSON.parse(text.slice(10));
-			uniformValues = {};
+			// uniformValues = {};
+			defaultUniformValues = {};
 			newUniforms.forEach((u) => {
+				let val = u.value;
+				let type = u.type;
 				if (u.value) {
-					let val = u.value;
-					let type = u.type;
 					if (type.startsWith('vec')) {
+						// # History
 						// const vals = val.slice(5, -1);
 						// const val_arr = JSON.parse(`[${vals}]`);
 						// const val_arr = (val as string).split(', ');
@@ -128,13 +135,25 @@
 
 						console.log(val);
 					}
-					uniformValues[u.name] = val;
+					if (!uniformValues[u.name]) {
+						uniformValues[u.name] = val;
+					}
+					defaultUniformValues[u.name] = val;
+				}
+				if (type.startsWith('vec') && !uniformValues[u.name]) {
+					uniformValues[u.name] = {};
+					const dims = ['x', 'y', 'z', 'w'];
+					dims.forEach((dim) => {
+						uniformValues[u.name][dim] = null;
+					});
 				}
 			});
 
 			uniforms = newUniforms;
-			console.log(uniforms);
+			console.log('wtf', uniforms);
+			console.log('VALLLL:', uniformValues);
 		}
+		text = '';
 	}
 
 	function onProgress(current: number, total: number) {
@@ -152,6 +171,7 @@
 		console.log(uniformName, type, JSON.stringify(data));
 		const updateUniforms = (window as any).updateUniforms as ((uniforms: any) => void) | undefined;
 		if (updateUniforms) {
+			loadingThings = true;
 			updateUniforms(
 				JSON.stringify({
 					type,
@@ -163,9 +183,9 @@
 	}
 </script>
 
-<div class="flex w-full flex-col">
+<div class="flex w-full flex-col overflow-auto rounded-md">
 	<button
-		class="flex h-12 w-full flex-row items-center justify-center bg-slate-300 text-xl"
+		class="flex h-12 w-full cursor-pointer flex-row items-center justify-center bg-slate-300 text-xl"
 		onclick={start}
 	>
 		{#if !started}
@@ -187,37 +207,53 @@
 
 			<div class="mt-4 flex flex-1 flex-row flex-wrap gap-4 overflow-y-scroll">
 				{#each uniforms as u}
-					<div class="flex {SHUFL_BOX} h-fit flex-row items-center gap-4">
+					<div class="flex {SHUFL_BOX} h-16 flex-row items-center gap-4">
 						{u.name}
+						{#if uniformValues[u.name] && defaultUniformValues[u.name] && defaultUniformValues[u.name] != uniformValues[u.name]}
+							<button onclick={(uniformValues[u.name] = defaultUniformValues[u.name])}>R</button>
+						{/if}
 						{#if u.type == 'float' || u.type == 'int'}
 							<input
 								type="number"
 								class="w-24 rounded-md border px-4 py-2"
 								placeholder={u.type}
 								step="1"
-								value={uniformValues[u.name]}
-								oninput={(e) => safeUpdateUniforms(Number(e.target.value), u.name, u.type)}
+								bind:value={uniformValues[u.name]}
+								oninput={(e: any) => safeUpdateUniforms(Number(e.target.value), u.name, u.type)}
 							/>
 						{:else if u.type == 'sampler2D'}
 							<input
 								type="file"
 								accept=".jpg,.png,.svg,.tga,.webp"
-								oninput={async (e) =>
-									safeUpdateUniforms(await genFileData(e.target.files[0]), u.name, u.type)}
+								class="w-24 rounded-md border px-4 py-2"
+								oninput={async (e: any) => {
+									// console.log(e.target.files[0]);
+									uniformValues[u.name] = e.target.files[0];
+									safeUpdateUniforms(await genFileData(e.target.files[0]), u.name, u.type);
+								}}
 							/>
+							{#if uniformValues[u.name]}
+								<img
+									src={uniformValues[u.name] ? URL.createObjectURL(uniformValues[u.name]) : ''}
+									class="h-10 w-10 rounded-md object-cover"
+									alt="{u.name} texture"
+								/>
+							{/if}
 						{:else if u.type.startsWith('vec') && [2, 3, 4].includes(Number(u.type.at(-1)))}
 							{#each ['x', 'y', 'z', 'w'].slice(0, Number(u.type.at(-1))) as dim}
 								<input
 									type="number"
 									placeholder={dim}
 									class="w-24 rounded-md border px-4 py-2"
-									value={uniformValues[u.name] ? uniformValues[u.name][dim] : 0}
-									oninput={(e) =>
+									bind:value={uniformValues[u.name][dim]}
+									oninput={(e: any) => {
+										console.log(uniformValues[u.name]);
 										safeUpdateUniforms(
 											{ dimension: dim, value: Number(e.target.value) },
 											u.name,
 											u.type
-										)}
+										);
+									}}
 								/>
 							{/each}
 						{/if}

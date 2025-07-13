@@ -19,3 +19,13 @@ static func arr_to_gd(arr: Array) -> Variant:
 			vec = Vector4(arr[0], arr[1], arr[2], arr[3])
 			
 	return vec
+
+static func empty_vec(type: String) -> Variant:
+	match type:
+		"vec2":
+			return Vector2.ZERO
+		"vec3":
+			return Vector3.ZERO
+		"vec4":
+			return Vector4.ZERO
+	return Vector2.ZERO

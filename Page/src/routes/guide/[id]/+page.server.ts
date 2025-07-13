@@ -33,7 +33,22 @@ export const load: PageServerLoad = async ({ params }) => {
   const blocks = await n2m.pageToMarkdown(id);
   const mdString = `# ${name}\n ${n2m.toMarkdownString(blocks).parent}`;
   const html = marked.parse(mdString);
-  const data = { html, name, next };
+
+  const guidesRes = await notion.databases.query({
+    database_id: env.NOTION_DATABASE_ID,
+    sorts: [
+      {
+        property: "ID",
+        direction: "ascending"
+      }
+    ]
+  })
+  const guides = guidesRes.results.map((g) => {
+    return { name: g.properties.Name.title[0].plain_text, id: g.properties.ID.rich_text[0].plain_text }
+  })
+  console.log(guides);
+
+  const data = { html, name, next, guides };
 
   cache[params.id] = { lastEdited, data };
   return data;

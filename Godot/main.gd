@@ -61,7 +61,9 @@ func _update_uniforms(args):
 		var val = data["value"]
 		
 		var vec = shader.get_shader_parameter(uniform_name)
-
+		print(vec)
+		if vec == null:
+			vec = VecUniform.empty_vec(type)
 		match dim:
 			"x":
 				vec.x = val
