@@ -1,7 +1,8 @@
 <script>
+	import StartingButton from '$lib/components/StartingButton.svelte';
 	import VidSlider from '$lib/components/VidSlider.svelte';
 	import { onMount } from 'svelte';
-	import { fade, fly, slide } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 
 	let loaded = $state(false);
 
@@ -16,13 +17,14 @@
 			<h1 class="font-[Arvo] text-5xl font-bold" transition:fly={{ duration: 1000, y: 50 }}>
 				Godot Shaders Guide
 			</h1>
-			<h2 class="text-lg italic" transition:fly={{ duration: 1000, y: 50, delay: 100 }}>
+			<h2 class="mb-8 text-lg italic" transition:fly={{ duration: 1000, y: 50, delay: 100 }}>
 				A free and interactive tutorial to learn the Godot shaders system
 			</h2>
+			<StartingButton></StartingButton>
 		</div>
 		<img
 			src="icon.png"
-			class="w-80"
+			class="w-80 transition hover:scale-105"
 			alt="godot shaders icon"
 			transition:slide={{ duration: 1000, axis: 'x' }}
 		/>
@@ -62,10 +64,7 @@
 			<li>Post-Processing</li>
 			<li>Integration with Godot Scripts</li>
 		</ul>
-		<a
-			class="mt-8 cursor-pointer rounded-md bg-blue-500 px-4 py-2 font-[Arvo] text-xl text-white shadow-md transition hover:bg-blue-400 hover:shadow-lg"
-			href="/guide/01-intro">Get Started Now</a
-		>
+		<StartingButton></StartingButton>
 	</div>
 	<img
 		src="/guide.png"
